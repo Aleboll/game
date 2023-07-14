@@ -42,11 +42,24 @@ public sealed class Board : MonoBehaviour
         }
     }
 
-    
-    
+
+
     public async void Select(Tile tile)
     {
-        if (!_selection.Contains(tile)) _selection.Add(tile);
+        if (!_selection.Contains(tile))
+        {
+            if (_selection.Count > 0)
+            {
+                if (Array.IndexOf(_selection[0].Neighbours, tile) != -1)
+                {
+                    _selection.Add(tile);
+                }
+            }
+            else
+            {
+                _selection.Add(tile);
+            }
+        }
 
         if (_selection.Count < 2) return;
 
@@ -58,11 +71,11 @@ public sealed class Board : MonoBehaviour
         {
             Pop();
         }
-        else 
+        else
         {
             await Swap(_selection[0], _selection[1]);
         }
-        
+
         _selection.Clear();
     }
 
@@ -93,14 +106,14 @@ public sealed class Board : MonoBehaviour
         tile1.Item = tile2.Item;
         tile2.Item = tile1Item;
     }
-    
+
     private bool CanPop()
     {
         for (var y = 0; y < Height; y++)
         {
             for (var x = 0; x < Width; x++)
             {
-                if (Tiles[x, y].GetConnectedTiles().Skip(1).Count() >= 2) 
+                if (Tiles[x, y].GetConnectedTiles().Skip(1).Count() >= 2)
                     return true;
             }
         }
@@ -109,7 +122,7 @@ public sealed class Board : MonoBehaviour
 
     private async void Pop()
     {
-        for (var y =0; y< Height; y++)
+        for (var y = 0; y < Height; y++)
         {
             for (var x = 0; x < Width; x++)
             {
@@ -117,7 +130,7 @@ public sealed class Board : MonoBehaviour
 
                 var connectedTiles = tile.GetConnectedTiles();
 
-                if (connectedTiles.Count < 2) continue;
+                if (connectedTiles.Skip(1).Count() < 2) continue;
 
                 var deflateSequence = DOTween.Sequence();
 
@@ -125,6 +138,8 @@ public sealed class Board : MonoBehaviour
 
                 await deflateSequence.Play()
                                     .AsyncWaitForCompletion();
+
+                ScoreCounte.Instance.Score += tile.Item.value * connectedTiles.Count;
 
                 var inflateSequence = DOTween.Sequence();
 
@@ -138,6 +153,9 @@ public sealed class Board : MonoBehaviour
 
                 await inflateSequence.Play()
                                     .AsyncWaitForCompletion();
+
+                x = 0;
+                y = 0;
             }
         }
     }
