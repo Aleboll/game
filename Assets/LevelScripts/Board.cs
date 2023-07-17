@@ -21,6 +21,11 @@ public sealed class Board : MonoBehaviour
     private const float TweenDuration = 0.25f;
     private void Awake() => Instance = this;
 
+    [SerializeField] private AudioClip CollectSound;
+
+    [SerializeField] private AudioSource audioSource;
+
+
     private void Start()
     {
         Tiles = new Tile[rows.Max(selector: row => row.tiles.Length), rows.Length];
@@ -136,6 +141,8 @@ public sealed class Board : MonoBehaviour
 
                 foreach (var connectedTile in connectedTiles) deflateSequence.Join(connectedTile.icon.transform.DOScale(Vector3.zero, TweenDuration));
 
+                audioSource.PlayOneShot(CollectSound);
+                
                 await deflateSequence.Play()
                                     .AsyncWaitForCompletion();
 

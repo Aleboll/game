@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,7 +28,7 @@ public sealed class Tile : MonoBehaviour
     public Button button;
 
     public Tile Left => x > 0 ? Board.Instance.Tiles[x - 1, y] : null;
-    public Tile Top => y > 0 ? Board.Instance.Tiles[x , y - 1] : null;
+    public Tile Top => y > 0 ? Board.Instance.Tiles[x, y - 1] : null;
     public Tile Right => x < Board.Instance.Width - 1 ? Board.Instance.Tiles[x + 1, y] : null;
     public Tile Bottom => y < Board.Instance.Height - 1 ? Board.Instance.Tiles[x, y + 1] : null;
 
@@ -43,27 +42,35 @@ public sealed class Tile : MonoBehaviour
 
     private void Start()
     {
-        button.onClick.AddListener(call:() => Board.Instance.Select(tile:this));
+        button.onClick.AddListener(call: () => Board.Instance.Select(tile: this));
     }
 
     public List<Tile> GetConnectedTiles(List<Tile> exclude = null)
     {
-        var result = new List<Tile> { this, };
-
         if (exclude == null)
         {
-            exclude = new List<Tile> { this, };
+            exclude = new List<Tile>();
         }
-        else
+        exclude.Add(this);
+
+        var result = new List<Tile> { this };
+
+        // Check horizontally (Left and Right)
+        foreach (var horizontalTile in new[] { Left, Right })
         {
-            exclude.Add(item: this);
+            if (horizontalTile != null && !exclude.Contains(horizontalTile) && horizontalTile.Item == Item)
+            {
+                result.AddRange(horizontalTile.GetConnectedTiles(exclude));
+            }
         }
 
-        foreach (var neighbour in Neighbours)
+        // Check vertically (Top and Bottom)
+        foreach (var verticalTile in new[] { Top, Bottom })
         {
-            if (neighbour == null || exclude.Contains(neighbour) || neighbour.Item != Item) continue;
-
-            result.AddRange(collection: neighbour.GetConnectedTiles(exclude));
+            if (verticalTile != null && !exclude.Contains(verticalTile) && verticalTile.Item == Item)
+            {
+                result.AddRange(verticalTile.GetConnectedTiles(exclude));
+            }
         }
 
         return result;

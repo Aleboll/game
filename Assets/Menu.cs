@@ -16,5 +16,10 @@ public class Menu : MonoBehaviour
         Debug.Log("Игра закрылась");
         Application.Quit();
     }
+
+    public void EnterRecordList()
+    {
+        SceneManager.LoadScene(3);
+    }
+
 }
- 

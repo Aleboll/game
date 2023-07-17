@@ -27,8 +27,5 @@ public sealed class ScoreCounte : MonoBehaviour
 
     public int HighScore = 0;
 
-    private void Update()
-    {
-        HighScore = PlayerPrefs.GetInt("Highscore");
-    }
+
 }
