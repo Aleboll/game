@@ -11,6 +11,7 @@ public sealed class Board : MonoBehaviour
 
     public Row[] rows;
 
+    private bool _isSwapping;
     public Tile[,] Tiles { get; private set; }
 
     public int Width => Tiles.GetLength(dimension: 0);
@@ -51,6 +52,7 @@ public sealed class Board : MonoBehaviour
 
     public async void Select(Tile tile)
     {
+        if (_isSwapping) return;
         if (!_selection.Contains(tile))
         {
             if (_selection.Count > 0)
@@ -86,6 +88,7 @@ public sealed class Board : MonoBehaviour
 
     public async Task Swap(Tile tile1, Tile tile2)
     {
+        _isSwapping = true;
         var icon1 = tile1.icon;
         var icon2 = tile2.icon;
 
@@ -110,6 +113,7 @@ public sealed class Board : MonoBehaviour
 
         tile1.Item = tile2.Item;
         tile2.Item = tile1Item;
+        _isSwapping = false;
     }
 
     private bool CanPop()
